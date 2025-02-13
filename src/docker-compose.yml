@@ -1,6 +1,31 @@
 ﻿services:
   catalog.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ASPNETCORE_URLS=http://+:8080
     image: catalog.api
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
     build:
       context: .
       dockerfile: Services/Catalog/Catalog.Api/Dockerfile
+  
+  catalog.db:
+    image: postgres
+    environment:
+      POSTGRES_USER: example
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: CatalogDb
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - catalog_volume:/var/lib/postgresql/data
+
+volumes:
+  catalog_volume:

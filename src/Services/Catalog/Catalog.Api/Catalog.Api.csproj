@@ -6,17 +6,21 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-        <PublishAot>true</PublishAot>
         <OptimizationPreference>Speed</OptimizationPreference>
     </PropertyGroup>
 
     <ItemGroup>
-      <Content Include="..\..\..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
+        <Content Include="..\..\..\.dockerignore">
+            <Link>.dockerignore</Link>
+        </Content>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks\BuildingBlocks.csproj" />
+        <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks\BuildingBlocks.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Carter" Version="9.0.0"/>
+        <PackageReference Include="Marten" Version="7.37.1"/>
     </ItemGroup>
 </Project>
