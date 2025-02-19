@@ -18,6 +18,7 @@ public class GetProductQueryHandler(
             "GetProductQueryHandler.Handle called with query: {query}",
             query
         );
+
         var products = await session
             .Query<Product>()
             .ToListAsync(cancellationToken);

@@ -17,11 +17,15 @@ public class CreateProductEndpoint : ICarterModule
                 "/products",
                 async (CreateProductRequest req, ISender sender) =>
                 {
-                    var command = CreateProductCommand.FromRequest(req);
+                    var command = CreateProductCommand.FromRequest(
+                        req
+                    );
 
                     var result = await sender.Send(command);
 
-                    var response = CreateProductResult.ToResponse(result);
+                    var response = CreateProductResult.ToResponse(
+                        result
+                    );
 
                     return Results.Created(
                         $"/products/{response.Id}",
@@ -30,9 +34,13 @@ public class CreateProductEndpoint : ICarterModule
                 }
             )
             .WithName("Create Product")
-            .Produces<CreateProductResponse>(StatusCodes.Status201Created)
+            .Produces<CreateProductResponse>(
+                StatusCodes.Status201Created
+            )
             .ProducesProblem(StatusCodes.Status500InternalServerError)
-            .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity)
+            .ProducesValidationProblem(
+                StatusCodes.Status422UnprocessableEntity
+            )
             .WithSummary("Create Product")
             .WithDescription("Create a product.");
 }
