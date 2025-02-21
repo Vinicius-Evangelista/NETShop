@@ -1,7 +1,9 @@
 using System.Collections.Immutable;
+using BuildingBlocks.CQRS;
 using FluentValidation;
+using MediatR;
 
-namespace Catalog.Api.Behaviors;
+namespace BuildingBlocks.Behaviors;
 
 public class ValidationBehavior<TRequest, TResponse>(
     IEnumerable<IValidator<TRequest>> validators

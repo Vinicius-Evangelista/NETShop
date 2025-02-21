@@ -30,7 +30,7 @@ public class UpdateProductHandler(
 
         if (product is null)
         {
-            throw new ProductNotFoundException();
+            throw new ProductNotFoundException(product!.Id);
         }
 
         session

@@ -25,7 +25,7 @@ public class GetProductQueryHandler(
 
         if (product is null)
         {
-            throw new ProductNotFoundException();
+            throw new ProductNotFoundException(product!.Id);
         }
 
         return new GetProductResult(product);
