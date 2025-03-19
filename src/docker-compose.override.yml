@@ -1,0 +1,31 @@
+services:
+  catalog.db:
+    container_name: catalog.db
+    environment:
+      - POSTGRES_USER=example
+      - POSTGRES_PASSWORD=example
+      - POSTGRES_DB=CatalogDb
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - catalog_volume:/var/lib/postgresql/data/
+
+
+  catalog.api:
+    container_name: catalog.api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - ConnectionStrings__Database=Server=catalog.db;Database=CatalogDb;Port=5432;User Id=example;Password=example;Include Error Detail=true;
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=123senha
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+    depends_on:
+      - catalog.db
+    ports:
+      - "6000:8080"
+      - "6060:8081"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - "//c/Users/vinie/.aspnet/https:/https:ro"

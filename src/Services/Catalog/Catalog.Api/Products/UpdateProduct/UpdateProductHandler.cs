@@ -13,10 +13,8 @@ public record UpdateProductCommand(
 
 public record UpdateProductResult(bool Success);
 
-public class UpdateProductHandler(
-    ILogger<UpdateProductHandler> logger,
-    IDocumentSession session
-) : ICommandHandler<UpdateProductCommand, UpdateProductResult>
+public class UpdateProductHandler(IDocumentSession session)
+    : ICommandHandler<UpdateProductCommand, UpdateProductResult>
 {
     public async Task<UpdateProductResult> Handle(
         UpdateProductCommand request,

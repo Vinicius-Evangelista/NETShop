@@ -5,10 +5,8 @@ public record DeleteProductCommand(Guid Id)
 
 public record DeleteProductResult(bool Success);
 
-internal class DeleteProductHandler(
-    IDocumentSession dbSession,
-    ILogger<DeleteProductHandler> logger
-) : ICommandHandler<DeleteProductCommand, DeleteProductResult>
+internal class DeleteProductHandler(IDocumentSession dbSession)
+    : ICommandHandler<DeleteProductCommand, DeleteProductResult>
 {
     public async Task<DeleteProductResult> Handle(
         DeleteProductCommand request,

@@ -4,8 +4,9 @@ public record GetProductRequest();
 
 public record GetProductResponse(IEnumerable<Product> Products)
 {
-    public static GetProductResponse ToResponse(GetProductResult result) =>
-        new GetProductResponse(result.Products);
+    public static GetProductResponse ToResponse(
+        GetProductResult result
+    ) => new GetProductResponse(result.Products);
 }
 
 public class GetProductByCategoryEndpoint : ICarterModule
@@ -19,7 +20,9 @@ public class GetProductByCategoryEndpoint : ICarterModule
                         new GetProductByCategoryQuery(category)
                     );
 
-                    var response = GetProductResponse.ToResponse(result);
+                    var response = GetProductResponse.ToResponse(
+                        result
+                    );
 
                     return Results.Ok(response);
                 }

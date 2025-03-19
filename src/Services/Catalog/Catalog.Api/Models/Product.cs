@@ -1,8 +1,7 @@
-namespace Catalog.Api;
+namespace Catalog.Api.Models;
 
 public class Product
 {
-    // TODO: verify the use o strongly typed id's concept
     public Guid Id { get; set; }
 
     public string Name { get; set; } = default!;

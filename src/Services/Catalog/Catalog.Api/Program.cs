@@ -1,6 +1,6 @@
 using BuildingBlocks.Behaviors;
-using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
+using BuildingBlocks.Exceptions.Handler;
+using Catalog.Api.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,13 +14,13 @@ builder.Services.AddMediatR(config =>
         assembly,
         buildingBlockAssembly
     );
-    config.AddBehavior(
-        typeof(IPipelineBehavior<,>),
-        typeof(ValidationBehavior<,>)
-    );
+    config.AddOpenBehavior(typeof(ValidationBehavior<,>));
+    config.AddOpenBehavior(typeof(LoggingBehavior<,>));
 });
 
 builder.Services.AddValidatorsFromAssembly(assembly);
+
+builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
 builder
     .Services.AddMarten(opts =>
@@ -31,43 +31,20 @@ builder
     })
     .UseLightweightSessions();
 
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.InitializeMartenWith<CatalogInitialData>();
+}
+
+builder.Services.AddHealthChecks();
+
 var app = builder.Build();
 
 app.MapCarter();
 
-app.UseExceptionHandler(exceptionHandler =>
-{
-    exceptionHandler.Run(async context =>
-    {
-        var exception = context
-            .Features.Get<IExceptionHandlerFeature>()
-            ?.Error;
+app.UseHealthChecks("/health");
 
-        if (exception is null)
-        {
-            return;
-        }
-
-        var problemsDetails = new ProblemDetails()
-        {
-            Title = exception.Message,
-            Status = StatusCodes.Status500InternalServerError,
-            Detail = exception.StackTrace,
-        };
-
-        var logger = context.RequestServices.GetRequiredService<
-            ILogger<Program>
-        >();
-
-        logger.LogError(exception, exception.Message);
-
-        context.Response.StatusCode =
-            StatusCodes.Status500InternalServerError;
-        context.Response.ContentType = "application/problem+json";
-
-        await context.Response.WriteAsJsonAsync(problemsDetails);
-    });
-});
+app.UseExceptionHandler(options => { });
 
 app.Run();
 

@@ -4,8 +4,9 @@ public record GetProductRequest();
 
 public record GetProductResponse(Product Product)
 {
-    public static GetProductResponse ToResponse(GetProductResult result) =>
-        new GetProductResponse(result.Product);
+    public static GetProductResponse ToResponse(
+        GetProductResult result
+    ) => new GetProductResponse(result.Product);
 }
 
 public class GetProductEndpoint : ICarterModule
@@ -15,9 +16,13 @@ public class GetProductEndpoint : ICarterModule
                 "/products/{id:guid}",
                 async (Guid id, ISender sender) =>
                 {
-                    var result = await sender.Send(new GetProductQuery(id));
+                    var result = await sender.Send(
+                        new GetProductQuery(id)
+                    );
 
-                    var response = GetProductResponse.ToResponse(result);
+                    var response = GetProductResponse.ToResponse(
+                        result
+                    );
 
                     return Results.Ok(response);
                 }
