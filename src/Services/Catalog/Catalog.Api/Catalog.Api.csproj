@@ -20,7 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Carter" Version="9.0.0"/>
-        <PackageReference Include="Marten" Version="7.37.1"/>
+        <PackageReference Include="Carter"/>
+        <PackageReference Include="Marten"/>
     </ItemGroup>
 </Project>

@@ -9,13 +9,17 @@ public class CatalogInitialData : IInitialData
     {
         await using var session = store.LightweightSession();
 
-        if (await session.Query<Product>().AnyAsync(cancellation))
+        if (
+            await session
+                .Query<Product>()
+                .AnyAsync(token: cancellation)
+        )
         {
             return;
         }
 
-        session.Store(GetPreconfiguredProduct());
-        await session.SaveChangesAsync(cancellation);
+        session.Store(entities: GetPreconfiguredProduct());
+        await session.SaveChangesAsync(token: cancellation);
     }
 
     private static IEnumerable<Product> GetPreconfiguredProduct() =>

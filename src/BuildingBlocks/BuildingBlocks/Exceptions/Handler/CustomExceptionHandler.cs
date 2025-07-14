@@ -2,7 +2,6 @@ using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace BuildingBlocks.Exceptions.Handler;
 
@@ -17,8 +16,8 @@ public class CustomExceptionHandler(
     )
     {
         logger.LogError(
-            exception,
-            "Error message: {exceptionMessage}, Time of occurrence: {time}",
+            exception: exception,
+            message: "Error message: {exceptionMessage}, Time of occurrence: {time}",
             exception.Message,
             DateTime.UtcNow
         );
@@ -62,21 +61,21 @@ public class CustomExceptionHandler(
         };
 
         problemDetails.Extensions.Add(
-            "traceId",
-            httpContext.TraceIdentifier
+            key: "traceId",
+            value: httpContext.TraceIdentifier
         );
 
         if (exception is ValidationException validationException)
         {
             problemDetails.Extensions.Add(
-                "errors",
-                validationException.Errors
+                key: "errors",
+                value: validationException.Errors
             );
         }
 
         await httpContext.Response.WriteAsJsonAsync(
-            problemDetails,
-            cancellationToken
+            value: problemDetails,
+            cancellationToken: cancellationToken
         );
 
         return true;

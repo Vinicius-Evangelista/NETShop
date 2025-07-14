@@ -2,31 +2,37 @@ using BuildingBlocks.Behaviors;
 using BuildingBlocks.Exceptions.Handler;
 using Catalog.Api.Data;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args: args);
 
 builder.Services.AddCarter();
 var assembly = typeof(Program).Assembly;
 var buildingBlockAssembly = typeof(ValidationBehavior<,>).Assembly;
 
-builder.Services.AddMediatR(config =>
+builder.Services.AddMediatR(configuration: config =>
 {
     config.RegisterServicesFromAssemblies(
         assembly,
         buildingBlockAssembly
     );
-    config.AddOpenBehavior(typeof(ValidationBehavior<,>));
-    config.AddOpenBehavior(typeof(LoggingBehavior<,>));
+    config.AddOpenBehavior(
+        openBehaviorType: typeof(ValidationBehavior<,>)
+    );
+    config.AddOpenBehavior(
+        openBehaviorType: typeof(LoggingBehavior<,>)
+    );
 });
 
-builder.Services.AddValidatorsFromAssembly(assembly);
+builder.Services.AddValidatorsFromAssembly(assembly: assembly);
 
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
 builder
-    .Services.AddMarten(opts =>
+    .Services.AddMarten(configure: opts =>
     {
         opts.Connection(
-            builder.Configuration.GetConnectionString("Database")!
+            connectionString: builder.Configuration.GetConnectionString(
+                name: "Database"
+            )!
         );
     })
     .UseLightweightSessions();
@@ -42,9 +48,9 @@ var app = builder.Build();
 
 app.MapCarter();
 
-app.UseHealthChecks("/health");
+app.UseHealthChecks(path: "/health");
 
-app.UseExceptionHandler(options => { });
+app.UseExceptionHandler(configure: options => { });
 
 app.Run();
 

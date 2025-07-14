@@ -14,33 +14,38 @@ public class CreateProductEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app) =>
         app.MapPost(
-                "/products",
-                async (CreateProductRequest req, ISender sender) =>
+                pattern: "/products",
+                handler: async (
+                    CreateProductRequest req,
+                    ISender sender
+                ) =>
                 {
                     var command = CreateProductCommand.FromRequest(
-                        req
+                        req: req
                     );
 
-                    var result = await sender.Send(command);
+                    var result = await sender.Send(request: command);
 
                     var response = CreateProductResult.ToResponse(
-                        result
+                        req: result
                     );
 
                     return Results.Created(
-                        $"/products/{response.Id}",
-                        response
+                        uri: $"/products/{response.Id}",
+                        value: response
                     );
                 }
             )
-            .WithName("Create Product")
+            .WithName(endpointName: "Create Product")
             .Produces<CreateProductResponse>(
-                StatusCodes.Status201Created
+                statusCode: StatusCodes.Status201Created
             )
-            .ProducesProblem(StatusCodes.Status500InternalServerError)
+            .ProducesProblem(
+                statusCode: StatusCodes.Status500InternalServerError
+            )
             .ProducesValidationProblem(
-                StatusCodes.Status422UnprocessableEntity
+                statusCode: StatusCodes.Status422UnprocessableEntity
             )
-            .WithSummary("Create Product")
-            .WithDescription("Create a product.");
+            .WithSummary(summary: "Create Product")
+            .WithDescription(description: "Create a product.");
 }

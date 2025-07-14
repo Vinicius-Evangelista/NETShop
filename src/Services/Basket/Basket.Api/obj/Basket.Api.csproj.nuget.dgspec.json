@@ -131,6 +131,10 @@
               "target": "Package",
               "version": "[9.0.0, )"
             },
+            "Marten": {
+              "target": "Package",
+              "version": "[7.37.1, )"
+            },
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[9.0.0, )"

@@ -22,25 +22,31 @@ public class UpdateProductHandler(IDocumentSession session)
     )
     {
         var product = await session.LoadAsync<Product>(
-            request.Id,
-            cancellationToken
+            id: request.Id,
+            token: cancellationToken
         );
 
         if (product is null)
         {
-            throw new ProductNotFoundException(product!.Id);
+            throw new ProductNotFoundException(id: product!.Id);
         }
 
         session
-            .Patch<Product>(request.Id)
-            .Set(x => x.Name, request.Name)
-            .Set(x => x.Category, request.Category)
-            .Set(x => x.Description, request.Description)
-            .Set(x => x.Price, request.Price)
-            .Set(x => x.ImageFile, request.ImageFile);
+            .Patch<Product>(id: request.Id)
+            .Set(expression: x => x.Name, value: request.Name)
+            .Set(expression: x => x.Category, value: request.Category)
+            .Set(
+                expression: x => x.Description,
+                value: request.Description
+            )
+            .Set(expression: x => x.Price, value: request.Price)
+            .Set(
+                expression: x => x.ImageFile,
+                value: request.ImageFile
+            );
 
-        await session.SaveChangesAsync(cancellationToken);
+        await session.SaveChangesAsync(token: cancellationToken);
 
-        return new UpdateProductResult(true);
+        return new UpdateProductResult(Success: true);
     }
 }

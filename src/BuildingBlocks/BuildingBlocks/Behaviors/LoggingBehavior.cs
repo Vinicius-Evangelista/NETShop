@@ -13,7 +13,7 @@ public class LoggingBehavior<TRequest, TResponse>(
     )
     {
         logger.LogInformation(
-            "[START] Handle request={Request} - Response={Response} - RequestData={RequestData}",
+            message: "[START] Handle request={Request} - Response={Response} - RequestData={RequestData}",
             request,
             typeof(TRequest).Name,
             typeof(TResponse).Name
@@ -30,14 +30,14 @@ public class LoggingBehavior<TRequest, TResponse>(
         if (timeTaken.Seconds > 3)
         {
             logger.LogWarning(
-                "[PERFORMANCE] Request={Request} took {TimeTaken}",
+                message: "[PERFORMANCE] Request={Request} took {TimeTaken}",
                 typeof(TRequest).Name,
                 timeTaken.Seconds
             );
         }
 
         logger.LogInformation(
-            "[END] Handle request={Request} - Response={Response} - TimeTaken={TimeTaken}",
+            message: "[END] Handle request={Request} - Response={Response} - TimeTaken={TimeTaken}",
             request,
             response,
             timeTaken

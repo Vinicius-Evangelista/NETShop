@@ -1,6 +1,3 @@
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Basket.Api.Basket.GetBasket;
 
 public record GetBasketQuery(string UserName)
@@ -10,14 +7,22 @@ public record GetBasketResult(ShoppingCart Cart)
 {
     public static GetBasketResponse ToResponse(
         GetBasketResult result
-    ) => new GetBasketResponse(result.Cart);
+    ) => new(Cart: result.Cart);
 }
 
-public class GetBasketHandler
+public class GetBasketHandler(IBasketRepository repository)
     : IQueryHandler<GetBasketQuery, GetBasketResult>
 {
     public async Task<GetBasketResult> Handle(
         GetBasketQuery query,
         CancellationToken cancellationToken
-    ) => new(new ShoppingCart("Vinicius"));
+    )
+    {
+        var cart = await repository.GetBasketAsync(
+            userName: query.UserName,
+            cancellationToken: cancellationToken
+        );
+
+        return new GetBasketResult(Cart: cart);
+    }
 }

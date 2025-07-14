@@ -5,7 +5,7 @@ public record DeleteProductCommand(Guid Id)
 
 public record DeleteProductResult(bool Success);
 
-internal class DeleteProductHandler(IDocumentSession dbSession)
+class DeleteProductHandler(IDocumentSession dbSession)
     : ICommandHandler<DeleteProductCommand, DeleteProductResult>
 {
     public async Task<DeleteProductResult> Handle(
@@ -13,10 +13,10 @@ internal class DeleteProductHandler(IDocumentSession dbSession)
         CancellationToken cancellationToken
     )
     {
-        dbSession.Delete<Product>(request.Id);
+        dbSession.Delete<Product>(id: request.Id);
 
-        await dbSession.SaveChangesAsync(cancellationToken);
+        await dbSession.SaveChangesAsync(token: cancellationToken);
 
-        return new DeleteProductResult(true);
+        return new DeleteProductResult(Success: true);
     }
 }

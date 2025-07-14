@@ -3,8 +3,9 @@ namespace BuildingBlocks.Exceptions;
 public class NotFoundException : Exception
 {
     public NotFoundException(string message)
-        : base(message) { }
+        : base(message: message) { }
 
     public NotFoundException(string name, object key)
-        : base($"Entity \"{name}\" ({key}) was not found.") { }
+        : base(message: $"Entity \"{name}\" ({key}) was not found.")
+    { }
 }

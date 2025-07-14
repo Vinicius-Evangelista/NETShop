@@ -13,12 +13,12 @@ public record UpdateProductRequest(
         UpdateProductRequest request
     ) =>
         new(
-            request.Id,
-            request.Name,
-            request.Category,
-            request.Description,
-            request.Price,
-            request.ImageFile
+            Id: request.Id,
+            Name: request.Name,
+            Category: request.Category,
+            Description: request.Description,
+            Price: request.Price,
+            ImageFile: request.ImageFile
         );
 }
 
@@ -26,34 +26,45 @@ public record UpdateProductResponse(bool Success)
 {
     public static UpdateProductResponse ToResponse(
         UpdateProductResult result
-    ) => new(result.Success);
+    ) => new(Success: result.Success);
 }
 
 public class UpdateProductEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app) =>
         app.MapPut(
-                "/products",
-                async (UpdateProductRequest req, ISender sender) =>
+                pattern: "/products",
+                handler: async (
+                    UpdateProductRequest req,
+                    ISender sender
+                ) =>
                 {
                     var result = await sender.Send(
-                        UpdateProductRequest.ToCommand(req)
+                        request: UpdateProductRequest.ToCommand(
+                            request: req
+                        )
                     );
 
                     var response = UpdateProductResponse.ToResponse(
-                        result
+                        result: result
                     );
 
                     return Results.Created(
-                        $"/products/{req.Id}",
-                        response
+                        uri: $"/products/{req.Id}",
+                        value: response
                     );
                 }
             )
-            .WithName("Update Product")
-            .Produces<UpdateProductResponse>(StatusCodes.Status200OK)
-            .ProducesProblem(StatusCodes.Status404NotFound)
-            .ProducesProblem(StatusCodes.Status400BadRequest)
-            .WithSummary("Update a Product")
-            .WithDescription("Update a product by id");
+            .WithName(endpointName: "Update Product")
+            .Produces<UpdateProductResponse>(
+                statusCode: StatusCodes.Status200OK
+            )
+            .ProducesProblem(
+                statusCode: StatusCodes.Status404NotFound
+            )
+            .ProducesProblem(
+                statusCode: StatusCodes.Status400BadRequest
+            )
+            .WithSummary(summary: "Update a Product")
+            .WithDescription(description: "Update a product by id");
 }

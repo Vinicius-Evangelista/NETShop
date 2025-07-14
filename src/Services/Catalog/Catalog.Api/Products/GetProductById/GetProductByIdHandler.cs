@@ -13,15 +13,15 @@ public class GetProductQueryHandler(IDocumentSession session)
     )
     {
         var product = await session.LoadAsync<Product>(
-            query.Id,
-            cancellationToken
+            id: query.Id,
+            token: cancellationToken
         );
 
         if (product is null)
         {
-            throw new ProductNotFoundException(product!.Id);
+            throw new ProductNotFoundException(id: product!.Id);
         }
 
-        return new GetProductResult(product);
+        return new GetProductResult(Product: product);
     }
 }

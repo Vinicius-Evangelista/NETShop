@@ -16,11 +16,11 @@ public class GetProductQueryHandler(IDocumentSession session)
         var products = await session
             .Query<Product>()
             .ToPagedListAsync(
-                query.PageNumber ?? 1,
-                query.PageSize ?? 10,
-                cancellationToken
+                pageNumber: query.PageNumber ?? 1,
+                pageSize: query.PageSize ?? 10,
+                token: cancellationToken
             );
 
-        return new GetProductResult(products);
+        return new GetProductResult(Products: products);
     }
 }

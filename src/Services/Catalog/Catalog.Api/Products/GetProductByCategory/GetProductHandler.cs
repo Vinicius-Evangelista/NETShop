@@ -15,9 +15,11 @@ public class GetProductQueryHandler(IDocumentSession session)
     {
         var products = await session
             .Query<Product>()
-            .Where(x => x.Category.Contains(byCategoryQuery.Category))
-            .ToListAsync(cancellationToken);
+            .Where(predicate: x =>
+                x.Category.Contains(byCategoryQuery.Category)
+            )
+            .ToListAsync(token: cancellationToken);
 
-        return new GetProductResult(products);
+        return new GetProductResult(Products: products);
     }
 }

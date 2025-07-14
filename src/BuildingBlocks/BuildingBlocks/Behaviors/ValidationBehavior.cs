@@ -1,7 +1,6 @@
 using System.Collections.Immutable;
 using BuildingBlocks.CQRS;
 using FluentValidation;
-using MediatR;
 
 namespace BuildingBlocks.Behaviors;
 
@@ -16,22 +15,27 @@ public class ValidationBehavior<TRequest, TResponse>(
         CancellationToken cancellationToken
     )
     {
-        var context = new ValidationContext<TRequest>(request);
+        var context = new ValidationContext<TRequest>(
+            instanceToValidate: request
+        );
 
         var validationResults = await Task.WhenAll(
-            validators.Select(v =>
-                v.ValidateAsync(context, cancellationToken)
+            tasks: validators.Select(selector: v =>
+                v.ValidateAsync(
+                    context: context,
+                    cancellation: cancellationToken
+                )
             )
         );
 
         var failures = validationResults
-            .Where(r => r.Errors.Any())
-            .SelectMany(r => r.Errors)
+            .Where(predicate: r => r.Errors.Any())
+            .SelectMany(selector: r => r.Errors)
             .ToImmutableArray();
 
         if (failures.Any())
         {
-            throw new ValidationException(failures);
+            throw new ValidationException(errors: failures);
         }
 
         return await next();

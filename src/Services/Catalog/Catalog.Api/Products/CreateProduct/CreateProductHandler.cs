@@ -12,11 +12,11 @@ public record CreateProductCommand(
         CreateProductRequest req
     ) =>
         new(
-            req.Name,
-            req.Category,
-            req.Description,
-            req.ImageFile,
-            req.Price
+            Name: req.Name,
+            Category: req.Category,
+            Description: req.Description,
+            ImageFile: req.ImageFile,
+            Price: req.Price
         );
 }
 
@@ -24,7 +24,7 @@ public record CreateProductResult(Guid Id)
 {
     public static CreateProductResponse ToResponse(
         CreateProductResult req
-    ) => new(req.Id);
+    ) => new(Id: req.Id);
 }
 
 public class CreateProductCommandValidator
@@ -32,33 +32,33 @@ public class CreateProductCommandValidator
 {
     public CreateProductCommandValidator()
     {
-        RuleFor(x => x.Name)
+        RuleFor(expression: x => x.Name)
             .NotEmpty()
-            .MaximumLength(100)
-            .WithMessage("Name is required");
+            .MaximumLength(maximumLength: 100)
+            .WithMessage(errorMessage: "Name is required");
 
-        RuleFor(x => x.Category)
+        RuleFor(expression: x => x.Category)
             .NotEmpty()
-            .WithMessage("Category is required");
+            .WithMessage(errorMessage: "Category is required");
 
-        RuleFor(x => x.Description)
+        RuleFor(expression: x => x.Description)
             .NotEmpty()
-            .MaximumLength(500)
-            .WithMessage("Description is required");
+            .MaximumLength(maximumLength: 500)
+            .WithMessage(errorMessage: "Description is required");
 
-        RuleFor(x => x.ImageFile)
+        RuleFor(expression: x => x.ImageFile)
             .NotEmpty()
-            .MaximumLength(100)
-            .WithMessage("ImageFile is required");
+            .MaximumLength(maximumLength: 100)
+            .WithMessage(errorMessage: "ImageFile is required");
 
-        RuleFor(x => x.Price)
-            .GreaterThan(0)
+        RuleFor(expression: x => x.Price)
+            .GreaterThan(valueToCompare: 0)
             .NotEmpty()
-            .WithMessage("Price is required");
+            .WithMessage(errorMessage: "Price is required");
     }
 }
 
-internal class CreateProductHandler(IDocumentSession dbSession)
+class CreateProductHandler(IDocumentSession dbSession)
     : ICommandHandler<CreateProductCommand, CreateProductResult>
 {
     public async Task<CreateProductResult> Handle(
@@ -76,8 +76,8 @@ internal class CreateProductHandler(IDocumentSession dbSession)
         };
 
         dbSession.Store(product);
-        await dbSession.SaveChangesAsync(cancellationToken);
+        await dbSession.SaveChangesAsync(token: cancellationToken);
 
-        return new CreateProductResult(product.Id);
+        return new CreateProductResult(Id: product.Id);
     }
 }

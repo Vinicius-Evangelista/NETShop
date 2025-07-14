@@ -9,10 +9,18 @@
     <ItemGroup>
         <PackageReference Include="Carter" Version="9.0.0"/>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0"/>
+        <PackageReference Include="Marten"/>
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks\BuildingBlocks.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="..\..\..\.dockerignore">
+            <Link>.dockerignore</Link>
+            <DependentUpon>Dockerfile</DependentUpon>
+        </Content>
     </ItemGroup>
 
 </Project>
