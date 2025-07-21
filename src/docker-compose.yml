@@ -5,6 +5,9 @@
   basket.db:
     image: postgres
   
+  distributed.cache:
+    image: redis
+  
   catalog.api:
     build:
       context: .

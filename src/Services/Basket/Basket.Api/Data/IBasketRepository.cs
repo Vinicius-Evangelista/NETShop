@@ -8,7 +8,7 @@ public interface IBasketRepository
     );
 
     Task<ShoppingCart> StoreBasketAsync(
-        ShoppingCart cart,
+        ShoppingCart basket,
         CancellationToken cancellationToken = default
     );
 

@@ -31,7 +31,7 @@ public class StoreBasketEndpointHandler(IBasketRepository repository)
     )
     {
         await repository.StoreBasketAsync(
-            cart: command.Cart,
+            basket: command.Cart,
             cancellationToken: cancellationToken
         );
         return new StoreBasketResult(UserName: command.Cart.UserName);

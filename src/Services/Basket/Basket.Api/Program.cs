@@ -1,5 +1,3 @@
-using BuildingBlocks.Behaviors;
-
 var assembly = typeof(Program).Assembly;
 var builder = WebApplication.CreateBuilder(args: args);
 
@@ -19,7 +17,14 @@ builder.Services.AddMediatR(configuration: config =>
     );
 });
 
-builder.Services.AddScoped<IBasketRepository, BasketRepository>();
+builder.Services.AddExceptionHandler<CustomExceptionHandler>();
+
+builder.Services.AddStackExchangeRedisCache(setupAction: options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString(
+        name: "Redis"
+    );
+});
 
 builder
     .Services.AddMarten(configure: opts =>
@@ -35,8 +40,27 @@ builder
     })
     .UseLightweightSessions();
 
+builder.Services.AddScoped<BasketRepository>();
+
+builder.Services.AddScoped<IBasketRepository>(
+    implementationFactory: provider =>
+    {
+        var basketRepository =
+            provider.GetRequiredService<BasketRepository>();
+
+        return new CachedBasketRepository(
+            repository: basketRepository,
+            cache: provider.GetRequiredService<IDistributedCache>()
+        );
+    }
+);
+
+builder.Services.AddHealthChecks();
+
 var app = builder.Build();
 
+app.UseExceptionHandler(configure: options => { });
 app.MapCarter();
+app.UseHealthChecks(path: "/health");
 
 app.Run();

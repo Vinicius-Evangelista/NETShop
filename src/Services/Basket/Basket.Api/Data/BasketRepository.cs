@@ -18,13 +18,13 @@ public class BasketRepository(IDocumentSession session)
     }
 
     public async Task<ShoppingCart> StoreBasketAsync(
-        ShoppingCart cart,
+        ShoppingCart basket,
         CancellationToken cancellationToken = default
     )
     {
-        session.Store(cart);
+        session.Store(basket);
         await session.SaveChangesAsync(token: cancellationToken);
-        return cart;
+        return basket;
     }
 
     public async Task<bool> DeleteBasketAsync(
