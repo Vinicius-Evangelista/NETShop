@@ -34,6 +34,7 @@ public class StoreBasketEndpointHandler(IBasketRepository repository)
             basket: command.Cart,
             cancellationToken: cancellationToken
         );
+
         return new StoreBasketResult(UserName: command.Cart.UserName);
     }
 }
