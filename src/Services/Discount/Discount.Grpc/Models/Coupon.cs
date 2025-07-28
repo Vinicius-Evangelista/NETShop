@@ -8,17 +8,17 @@ public class Coupon
         int id,
         string productName,
         string description,
-        int quantity
+        int amount
     )
     {
         Id = id;
         ProductName = productName;
         Description = description;
-        Quantity = quantity;
+        Amount = amount;
     }
 
     public int Id { get; set; }
     public string ProductName { get; set; } = default!;
     public string Description { get; set; } = default!;
-    public int Quantity { get; set; }
+    public int Amount { get; set; }
 }

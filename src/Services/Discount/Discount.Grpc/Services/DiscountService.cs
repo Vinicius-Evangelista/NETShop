@@ -23,7 +23,7 @@ public class DiscountService(
             ?? new Coupon
             {
                 ProductName = "No Discount",
-                Quantity = 0,
+                Amount = 0,
                 Description = "",
             };
 

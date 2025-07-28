@@ -1,3 +1,5 @@
+using Discount.Grpc;
+
 var assembly = typeof(Program).Assembly;
 var builder = WebApplication.CreateBuilder(args: args);
 
@@ -39,6 +41,28 @@ builder
             .Identity(member: x => x.UserName);
     })
     .UseLightweightSessions();
+
+builder
+    .Services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(
+        configureClient: options =>
+        {
+            options.Address = new Uri(
+                uriString: builder.Configuration[
+                    key: "GrpcSettings:DiscountUrl"
+                ] ?? throw new ArgumentNullException()
+            );
+        }
+    )
+    .ConfigurePrimaryHttpMessageHandler(configureHandler: () =>
+    {
+        var handler = new HttpClientHandler()
+        {
+            ServerCertificateCustomValidationCallback =
+                HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
+        };
+
+        return handler;
+    });
 
 builder.Services.AddScoped<BasketRepository>();
 

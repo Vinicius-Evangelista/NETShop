@@ -2,6 +2,7 @@
 using Discount.Grpc.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Discount.Grpc.Migrations
 {
     [DbContext(typeof(DiscountDbContext))]
-    partial class DiscountContextModelSnapshot : ModelSnapshot
+    [Migration("20250724203933_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.7");
@@ -22,6 +25,9 @@ namespace Discount.Grpc.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("Amount")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -29,9 +35,6 @@ namespace Discount.Grpc.Migrations
                     b.Property<string>("ProductName")
                         .IsRequired()
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -41,16 +44,16 @@ namespace Discount.Grpc.Migrations
                         new
                         {
                             Id = 1,
+                            Amount = 1,
                             Description = "IPhone Discount",
-                            ProductName = "IPhone X",
-                            Quantity = 1
+                            ProductName = "IPhone X"
                         },
                         new
                         {
                             Id = 2,
+                            Amount = 2,
                             Description = "Samsung Discount",
-                            ProductName = "Samsung S10",
-                            Quantity = 2
+                            ProductName = "Samsung S10"
                         });
                 });
 #pragma warning restore 612, 618

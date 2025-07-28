@@ -20,13 +20,13 @@ public class DiscountDbContext(
                     id: 1,
                     productName: "IPhone X",
                     description: "IPhone Discount",
-                    quantity: 1
+                    amount: 1
                 ),
                 new Coupon(
                     id: 2,
                     productName: "Samsung S10",
                     description: "Samsung Discount",
-                    quantity: 2
+                    amount: 2
                 )
             );
     }
