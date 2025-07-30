@@ -10,6 +10,15 @@ services:
       - "5432:5432"
     volumes:
       - catalog_volume:/var/lib/postgresql/data/
+  
+  order.db:
+    container_name: order.db
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=SwN12345678
+    restart: always
+    ports:
+      - "1433:1433"
 
   catalog.api:
     container_name: catalog.api

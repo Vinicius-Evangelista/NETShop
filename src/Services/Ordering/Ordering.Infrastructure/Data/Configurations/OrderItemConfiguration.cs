@@ -1,6 +1,7 @@
 namespace Ordering.Infrastructure.Data.Configurations;
 
-public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
+public class
+    OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
 {
     public void Configure(EntityTypeBuilder<OrderItem> builder)
     {
@@ -16,7 +17,7 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
 
         builder.Property(oi => oi.Quantity).IsRequired();
 
-        builder.Property(oi => oi.Price).IsRequired();
+        builder.Property(oi => oi.Price).IsRequired()
+            .HasColumnType("decimal(18,2)");
     }
 }
-

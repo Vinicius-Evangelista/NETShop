@@ -112,6 +112,7 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
                 dbStatus =>
                     Enum.Parse<OrderStatus>(dbStatus));
 
-        builder.Property(o => o.TotalPrice);
+        builder.Property(o => o.TotalPrice)
+            .HasColumnType("decimal(18,2)");
     }
 }

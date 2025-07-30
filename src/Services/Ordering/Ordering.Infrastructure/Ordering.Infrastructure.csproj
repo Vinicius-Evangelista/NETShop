@@ -15,4 +15,8 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Migrations\" />
+    </ItemGroup>
+
 </Project>
