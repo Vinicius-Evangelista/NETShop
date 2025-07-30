@@ -1,24 +1,24 @@
+using BuildingBlocks.Exceptions.Handler;
+using Carter;
+
 namespace Ordering.API;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApiServices(
-        this IServiceCollection services
-    )
+    public static IServiceCollection AddApiServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddControllers();
-        services.AddEndpointsApiExplorer();
-        services.AddHealthChecks();
+        services.AddCarter();
+
+        services.AddExceptionHandler<CustomExceptionHandler>();
 
         return services;
     }
 
-    public static WebApplication UseApplicationServices(
-        this WebApplication app
-    )
+    public static WebApplication UseApiServices(this WebApplication app)
     {
-        app.MapControllers();
-        app.MapHealthChecks(pattern: "/health");
+        app.MapCarter();
+
+        app.UseExceptionHandler(options => { });
 
         return app;
     }
