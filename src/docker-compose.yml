@@ -33,6 +33,11 @@
       
   message.broker:
     image: rabbitmq:management
+    
+  yarp.apigateway:
+    build:
+      context: .
+      dockerfile: /ApiGateways/Yarp.ApiGateway/Dockerfile 
 
 volumes:
   catalog_volume:
