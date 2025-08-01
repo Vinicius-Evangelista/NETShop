@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <Sdk Name="Aspire.AppHost.Sdk" Version="9.4.0"/>
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <UserSecretsId>73edefe1-8885-4505-9181-ad4d4e5ae6d3</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Aspire.Hosting.AppHost" Version="9.4.0"/>
+        <PackageReference Update="Grpc.AspNetCore" Version="2.71.0" />
+        <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="9.4.0" />
+        <PackageReference Include="Aspire.Hosting.RabbitMQ" Version="9.4.0" />
+        <PackageReference Include="Aspire.Hosting.Redis" Version="9.4.0" />
+    </ItemGroup>
+
+</Project>
