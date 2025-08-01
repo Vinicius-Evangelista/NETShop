@@ -1,5 +1,6 @@
 using BuildingBlocks.Exceptions.Handler;
 using Carter;
+using Ordering.API.Infrastructure;
 
 namespace Ordering.API;
 

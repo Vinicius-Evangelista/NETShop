@@ -4,11 +4,16 @@ namespace Ordering.Infrastructure.Data.Extensions;
 
 public static class DatabaseExtensions
 {
-    public static async Task InitialiseDatabaseAsync(this WebApplication app)
+    public static async Task InitialiseDatabaseAsync(
+        this WebApplication app)
     {
         using var scope = app.Services.CreateScope();
 
-        var context = scope.ServiceProvider.GetRequiredService<OrderingDbContext>();
+        var context = scope.ServiceProvider
+            .GetRequiredService<OrderingDbContext>();
+
+        context.Database.EnsureDeletedAsync().GetAwaiter()
+            .GetResult();
 
         context.Database.MigrateAsync().GetAwaiter().GetResult();
 
@@ -22,29 +27,35 @@ public static class DatabaseExtensions
         await SeedOrdersWithItemsAsync(context);
     }
 
-    private static async Task SeedCustomerAsync(OrderingDbContext context)
+    private static async Task SeedCustomerAsync(
+        OrderingDbContext context)
     {
         if (!await context.Customers.AnyAsync())
         {
-            await context.Customers.AddRangeAsync(InitialData.Customers);
+            await context.Customers.AddRangeAsync(InitialData
+                .Customers);
             await context.SaveChangesAsync();
         }
     }
 
-    private static async Task SeedProductAsync(OrderingDbContext context)
+    private static async Task SeedProductAsync(
+        OrderingDbContext context)
     {
         if (!await context.Products.AnyAsync())
         {
-            await context.Products.AddRangeAsync(InitialData.Products);
+            await context.Products.AddRangeAsync(InitialData
+                .Products);
             await context.SaveChangesAsync();
         }
     }
 
-    private static async Task SeedOrdersWithItemsAsync(OrderingDbContext context)
+    private static async Task SeedOrdersWithItemsAsync(
+        OrderingDbContext context)
     {
         if (!await context.Orders.AnyAsync())
         {
-            await context.Orders.AddRangeAsync(InitialData.OrdersWithItems);
+            await context.Orders.AddRangeAsync(InitialData
+                .OrdersWithItems);
             await context.SaveChangesAsync();
         }
     }

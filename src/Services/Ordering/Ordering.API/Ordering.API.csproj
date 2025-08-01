@@ -18,10 +18,4 @@
       <ProjectReference Include="..\Ordering.Infrastructure\Ordering.Infrastructure.csproj" />
     </ItemGroup>
     
-    <ItemGroup>
-        <PackageReference Include="Carter" />
-        <PackageReference Include="Marten" />
-        <PackageReference Include="Mapster" />
-    </ItemGroup>
-
 </Project>

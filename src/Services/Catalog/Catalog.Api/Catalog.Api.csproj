@@ -18,9 +18,4 @@
     <ItemGroup>
         <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks\BuildingBlocks.csproj"/>
     </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Carter"/>
-        <PackageReference Include="Marten"/>
-    </ItemGroup>
 </Project>

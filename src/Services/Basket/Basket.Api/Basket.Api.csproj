@@ -7,14 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Carter"/>
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi"/>
-        <PackageReference Include="Marten"/>
-        <PackageReference Include="Grpc.AspNetCore"/>
-        <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks\BuildingBlocks.csproj"/>
     </ItemGroup>
     

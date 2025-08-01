@@ -15,16 +15,27 @@ public static class DependencyInjection
             name: "Database"
         );
 
-        services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
-        services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
+        services
+            .AddScoped<ISaveChangesInterceptor,
+                AuditableEntityInterceptor>();
+        services
+            .AddScoped<ISaveChangesInterceptor,
+                DispatchDomainEventsInterceptor>();
 
         services.AddDbContext<OrderingDbContext>((sp, options) =>
         {
-            options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
-            options.UseSqlServer(connectionString);
+            options.AddInterceptors(
+                sp.GetServices<ISaveChangesInterceptor>());
+            options.UseSqlServer(connectionString, sqlOptions =>
+                sqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 5,
+                    maxRetryDelay: TimeSpan.FromSeconds(3),
+                    errorNumbersToAdd: null)
+            );
         });
 
-        services.AddScoped<IApplicationDbContext, OrderingDbContext>();
+        services
+            .AddScoped<IApplicationDbContext, OrderingDbContext>();
 
         return services;
     }

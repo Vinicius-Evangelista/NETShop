@@ -16,6 +16,11 @@
       context: .
       dockerfile: Services/Catalog/Catalog.API/Dockerfile
   
+  ordering.api:
+    build:
+      context: .
+      dockerfile: Services/Ordering/Ordering.API/Dockerfile
+      
   basket.api:
     build:
       context: .

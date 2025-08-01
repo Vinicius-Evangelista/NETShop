@@ -8,13 +8,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Grpc.AspNetCore"/>
-        <PackageReference Include="Mapster" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <Content Include="..\.dockerignore">
             <Link>.dockerignore</Link>
         </Content>
