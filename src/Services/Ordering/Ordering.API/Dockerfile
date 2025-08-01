@@ -5,6 +5,7 @@ COPY ["Directory.Packages.props", "./"]
 
 COPY ["Services/Ordering/Ordering.API/Ordering.API.csproj", "Services/Ordering/Ordering.API/"]
 COPY ["BuildingBlocks/BuildingBlocks/BuildingBlocks.csproj", "BuildingBlocks/BuildingBlocks/"]
+COPY ["BuildingBlocks/BuildingBlocks.Messaging/BuildingBlocks.Messaging.csproj", "BuildingBlocks/BuildingBlocks.Messaging/"]
 COPY ["Services/Ordering/Ordering.Application/Ordering.Application.csproj", "Services/Ordering/Ordering.Application/"]
 COPY ["Services/Ordering/Ordering.Infrastructure/Ordering.Infrastructure.csproj", "Services/Ordering/Ordering.Infrastructure/"]
 COPY ["Services/Ordering/Ordering.Domain/Ordering.Domain.csproj", "Services/Ordering/Ordering.Domain/"]
@@ -15,6 +16,7 @@ RUN dotnet restore "Ordering.API.csproj" --runtime linux-musl-x64
 WORKDIR /src
 COPY ["Services/Ordering/Ordering.API/", "Services/Ordering/Ordering.API/"]
 COPY ["BuildingBlocks/BuildingBlocks/", "BuildingBlocks/BuildingBlocks/"]
+COPY ["BuildingBlocks/BuildingBlocks.Messaging/", "BuildingBlocks/BuildingBlocks.Messaging/"]
 COPY ["Services/Ordering/Ordering.Application/", "Services/Ordering/Ordering.Application/"]
 COPY ["Services/Ordering/Ordering.Infrastructure/", "Services/Ordering/Ordering.Infrastructure/"]
 COPY ["Services/Ordering/Ordering.Domain/", "Services/Ordering/Ordering.Domain/"]

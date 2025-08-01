@@ -19,18 +19,14 @@ public static class Extensions
 
             busConfigurator.UsingRabbitMq((context, configurator) =>
             {
-                var rabbitMqSettings = configuration.GetSection("RabbitMQ");
-                configurator.Host(
-                    rabbitMqSettings["Host"],
-                    rabbitMqSettings["VirtualHost"],
-                    hostConfigurator =>
-                    {
-                        hostConfigurator.Username(rabbitMqSettings["Username"]);
-                        hostConfigurator.Password(rabbitMqSettings["Password"]);
-                    });
-
+                configurator.Host(new Uri(configuration["MessageBroker:Host"]!), host =>
+                {
+                    host.Username(configuration["MessageBroker:UserName"]);
+                    host.Password(configuration["MessageBroker:Password"]);
+                });
                 configurator.ConfigureEndpoints(context);
             });
+
         });
 
         return services;

@@ -20,5 +20,6 @@
         <PackageReference Include="FluentValidation" />
         <PackageReference Include="FluentValidation.AspNetCore" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+        <PackageReference Include="Microsoft.FeatureManagement.AspNetCore" />
     </ItemGroup>
 </Project>

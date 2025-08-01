@@ -29,6 +29,9 @@ services:
       - ConnectionStrings__Database=Server=order.db;Database=OrderDb;User Id=sa;Password=SwN12345678;Encrypt=False;TrustServerCertificate=True
       - ASPNETCORE_Kestrel__Certificates__Default__Password=123senha
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+      - MessageBroker__Host=amqp://ecommerce-mq:5672
+      - MessageBroker__UserName=guest
+      - MessageBroker__Password=guest
     depends_on:
       - order.db
     ports:
@@ -85,6 +88,9 @@ services:
       - GrpcSettings__DiscountUrl=https://discount.grpc:8081
       - ASPNETCORE_Kestrel__Certificates__Default__Password=123senha
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+      - MessageBroker__Host=amqp://ecommerce-mq:5672
+      - MessageBroker__UserName=guest
+      - MessageBroker__Password=guest 
     depends_on:
       - basket.db
     ports:
@@ -93,6 +99,17 @@ services:
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - "//c/Users/vinie/.aspnet/https:/https:ro"
+       
+  message.broker:
+    container_name: message.broker
+    hostname: ecommerce-mq
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672" 
   
   discount.grpc:
     container_name: discount.grpc

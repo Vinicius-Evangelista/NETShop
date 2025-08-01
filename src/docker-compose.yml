@@ -30,6 +30,9 @@
     build:
       context: .
       dockerfile: Services/Discount/Discount.Grpc/Dockerfile
+      
+  message.broker:
+    image: rabbitmq:management
 
 volumes:
   catalog_volume:
