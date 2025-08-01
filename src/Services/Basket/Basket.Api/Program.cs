@@ -1,3 +1,4 @@
+using BuildingBlocks.Messaging.MassTransit;
 using Discount.Grpc;
 
 var assembly = typeof(Program).Assembly;
@@ -80,6 +81,8 @@ builder.Services.AddScoped<IBasketRepository>(
 );
 
 builder.Services.AddHealthChecks();
+
+builder.Services.AddMessageBroker(builder.Configuration);
 
 var app = builder.Build();
 
