@@ -2,7 +2,6 @@ using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add rate limiting services
 builder.Services.AddRateLimiter(options => {
     options.AddPolicy("fixed", context =>
         RateLimitPartition.GetFixedWindowLimiter(
@@ -19,7 +18,6 @@ builder.Services.AddReverseProxy()
 
 var app = builder.Build();
 
-// Enable rate limiting middleware
 app.UseRateLimiter();
 
 app.MapReverseProxy();

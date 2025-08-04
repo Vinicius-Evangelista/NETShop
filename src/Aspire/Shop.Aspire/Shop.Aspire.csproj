@@ -17,6 +17,7 @@
         <PackageReference Include="Aspire.Hosting.RabbitMQ" Version="9.4.0" />
         <PackageReference Include="Aspire.Hosting.Redis" Version="9.4.0" />
         <PackageReference Include="Aspire.Hosting.SqlServer" Version="9.4.0" />
+        <PackageReference Include="Aspire.Hosting.Yarp" Version="9.4.0-preview.1.25378.8" />
     </ItemGroup>
 
 </Project>
