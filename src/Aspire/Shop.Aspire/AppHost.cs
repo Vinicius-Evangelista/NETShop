@@ -2,22 +2,21 @@ using Aspire.Hosting.Yarp.Transforms;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-builder.AddDockerComposeEnvironment("env");
-
 var catalogDb = builder.AddPostgres("catalog-db",
         builder.AddParameter("catalog-username", "example"),
         builder.AddParameter("catalog-password", "example"))
     .WithEnvironment("POSTGRES_USER", "example")
     .WithEnvironment("POSTGRES_PASSWORD", "example")
     .WithEnvironment("POSTGRES_DB", "CatalogDb")
-    .WithHostPort(5432);
+    .WithHostPort(5432)
+    .WithOtlpExporter();
 
 var basketDb = builder.AddPostgres("basket-db",
         builder.AddParameter("basket-username", "example"),
         builder.AddParameter("basket-password", "example"))
     .WithEnvironment("POSTGRES_DB", "BasketDb")
-    .WithHostPort(5433);
-
+    .WithHostPort(5433)
+    .WithOtlpExporter();
 
 var orderDb = builder.AddSqlServer("order-db",
         builder.AddParameter("order-password", "SwN12345678"))
@@ -32,10 +31,11 @@ var redis = builder.AddRedis("distributed-cache", 6379)
 var rabbitmq = builder.AddRabbitMQ("ecommerce-mq",
         builder.AddParameter("rabbitmq-username", "guest"),
         builder.AddParameter("rabbitmq-password", "guest"), 5672)
-    .WithManagementPlugin(15672);
+    .WithManagementPlugin(15672).WithOtlpExporter();
 
 var basketApiLocal = builder.AddProject("basket-api",
-    "../../Services/Basket/Basket.Api/Basket.Api.csproj");
+        "../../Services/Basket/Basket.Api/Basket.Api.csproj")
+    .WithOtlpExporter();
 
 var catalogApiLocal = builder.AddProject("catalog-api",
     "../../Services/Catalog/Catalog.Api/Catalog.Api.csproj");
@@ -70,7 +70,8 @@ var gateway = builder.AddYarp("gateway")
             .WithTransformRequestHeader("X-Forwarded-Host",
                 "shop.gateway.com")
             .WithTransformResponseHeader("X-Powered-By", "YARP");
-    });
+    })
+    .WithOtlpExporter();
 
 basketApiLocal.WithReference(basketDb)
     .WaitFor(basketDb);
