@@ -1,0 +1,204 @@
+services:
+  env-dashboard:
+    image: "mcr.microsoft.com/dotnet/nightly/aspire-dashboard:latest"
+    expose:
+      - "18888"
+      - "18889"
+    networks:
+      - "aspire"
+    restart: "always"
+  catalog-db:
+    image: "docker.io/library/postgres:17.5"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: "scram-sha-256"
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
+      POSTGRES_USER: "example"
+      POSTGRES_PASSWORD: "example"
+      POSTGRES_DB: "CatalogDb"
+    expose:
+      - "5432"
+    networks:
+      - "aspire"
+  basket-db:
+    image: "docker.io/library/postgres:17.5"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: "scram-sha-256"
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
+      POSTGRES_USER: "${BASKET_USERNAME}"
+      POSTGRES_PASSWORD: "${BASKET_PASSWORD}"
+      POSTGRES_DB: "BasketDb"
+    expose:
+      - "5432"
+    networks:
+      - "aspire"
+  order-db:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${ORDER_PASSWORD}"
+    expose:
+      - "1433"
+    networks:
+      - "aspire"
+  distributed-cache:
+    image: "docker.io/library/redis:7.4"
+    command:
+      - "-c"
+      - "redis-server --requirepass $$REDIS_PASSWORD"
+    entrypoint:
+      - "/bin/sh"
+    environment:
+      REDIS_PASSWORD: "${REDIS_PASSWORD}"
+    expose:
+      - "6379"
+    networks:
+      - "aspire"
+  ecommerce-mq:
+    image: "docker.io/library/rabbitmq:4.1-management"
+    environment:
+      RABBITMQ_DEFAULT_USER: "${RABBITMQ_USERNAME}"
+      RABBITMQ_DEFAULT_PASS: "${RABBITMQ_PASSWORD}"
+    expose:
+      - "5672"
+      - "15672"
+    networks:
+      - "aspire"
+  basket-api:
+    image: "${BASKET_API_IMAGE}"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "${BASKET_API_PORT}"
+      ConnectionStrings__basket-db: "Host=basket-db;Port=5432;Username=${BASKET_USERNAME};Password=${BASKET_PASSWORD}"
+      ConnectionStrings__distributed-cache: "distributed-cache:6379,password=${REDIS_PASSWORD}"
+      services__discount-service__http__0: "http://discount-service:${DISCOUNT_SERVICE_PORT}"
+      ConnectionStrings__ecommerce-mq: "amqp://${RABBITMQ_USERNAME}:${RABBITMQ_PASSWORD}@ecommerce-mq:5672"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://env-dashboard:18889"
+      OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
+      OTEL_SERVICE_NAME: "basket-api"
+    expose:
+      - "${BASKET_API_PORT}"
+    depends_on:
+      basket-db:
+        condition: "service_started"
+      distributed-cache:
+        condition: "service_started"
+      discount-service:
+        condition: "service_started"
+      ecommerce-mq:
+        condition: "service_started"
+    networks:
+      - "aspire"
+  catalog-api:
+    image: "${CATALOG_API_IMAGE}"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "${CATALOG_API_PORT}"
+      ConnectionStrings__catalog-db: "Host=catalog-db;Port=5432;Username=${CATALOG_USERNAME};Password=${CATALOG_PASSWORD}"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://env-dashboard:18889"
+      OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
+      OTEL_SERVICE_NAME: "catalog-api"
+    expose:
+      - "${CATALOG_API_PORT}"
+    depends_on:
+      catalog-db:
+        condition: "service_started"
+    networks:
+      - "aspire"
+  discount-service:
+    image: "${DISCOUNT_SERVICE_IMAGE}"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "${DISCOUNT_SERVICE_PORT}"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://env-dashboard:18889"
+      OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
+      OTEL_SERVICE_NAME: "discount-service"
+    expose:
+      - "${DISCOUNT_SERVICE_PORT}"
+    networks:
+      - "aspire"
+  ordering-api:
+    image: "${ORDERING_API_IMAGE}"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "${ORDERING_API_PORT}"
+      ConnectionStrings__order-db: "Server=order-db,1433;User ID=sa;Password=${ORDER_PASSWORD};TrustServerCertificate=true"
+      ConnectionStrings__ecommerce-mq: "amqp://${RABBITMQ_USERNAME}:${RABBITMQ_PASSWORD}@ecommerce-mq:5672"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://env-dashboard:18889"
+      OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
+      OTEL_SERVICE_NAME: "ordering-api"
+    expose:
+      - "${ORDERING_API_PORT}"
+    depends_on:
+      order-db:
+        condition: "service_started"
+      ecommerce-mq:
+        condition: "service_started"
+    networks:
+      - "aspire"
+  gateway:
+    image: "mcr.microsoft.com/dotnet/nightly/yarp:2.3.0-preview.4"
+    command:
+      - "/app/yarp.dll"
+    entrypoint:
+      - "dotnet"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+      services__basket-api__http__0: "http://basket-api:${BASKET_API_PORT}"
+      REVERSEPROXY__ROUTES__route0__MATCH__PATH: "/basket-api/{**catch-all}"
+      REVERSEPROXY__ROUTES__route0__CLUSTERID: "cluster_basket-api"
+      REVERSEPROXY__ROUTES__route0__TRANSFORMS__0__PathRemovePrefix: "/basket-api"
+      REVERSEPROXY__ROUTES__route0__TRANSFORMS__1__RequestHeader: "X-Forwarded-Host"
+      REVERSEPROXY__ROUTES__route0__TRANSFORMS__1__Append: "shop.gateway.com"
+      REVERSEPROXY__ROUTES__route0__TRANSFORMS__2__ResponseHeader: "X-Powered-By"
+      REVERSEPROXY__ROUTES__route0__TRANSFORMS__2__Append: "YARP"
+      REVERSEPROXY__ROUTES__route0__TRANSFORMS__2__When: "Success"
+      REVERSEPROXY__ROUTES__route1__MATCH__PATH: "order-api/{**catch-all}"
+      REVERSEPROXY__ROUTES__route1__CLUSTERID: "cluster_ordering-api"
+      REVERSEPROXY__ROUTES__route1__TRANSFORMS__0__PathRemovePrefix: "/order-api"
+      REVERSEPROXY__ROUTES__route1__TRANSFORMS__1__RequestHeader: "X-Forwarded-Host"
+      REVERSEPROXY__ROUTES__route1__TRANSFORMS__1__Append: "shop.gateway.com"
+      REVERSEPROXY__ROUTES__route1__TRANSFORMS__2__ResponseHeader: "X-Powered-By"
+      REVERSEPROXY__ROUTES__route1__TRANSFORMS__2__Append: "YARP"
+      REVERSEPROXY__ROUTES__route1__TRANSFORMS__2__When: "Success"
+      REVERSEPROXY__ROUTES__route2__MATCH__PATH: "/catalog-api/{**catch-all}"
+      REVERSEPROXY__ROUTES__route2__CLUSTERID: "cluster_catalog-api"
+      REVERSEPROXY__ROUTES__route2__TRANSFORMS__0__PathRemovePrefix: "/catalog-api"
+      REVERSEPROXY__ROUTES__route2__TRANSFORMS__1__RequestHeader: "X-Forwarded-Host"
+      REVERSEPROXY__ROUTES__route2__TRANSFORMS__1__Append: "shop.gateway.com"
+      REVERSEPROXY__ROUTES__route2__TRANSFORMS__2__ResponseHeader: "X-Powered-By"
+      REVERSEPROXY__ROUTES__route2__TRANSFORMS__2__Append: "YARP"
+      REVERSEPROXY__ROUTES__route2__TRANSFORMS__2__When: "Success"
+      REVERSEPROXY__CLUSTERS__cluster_basket-api__DESTINATIONS__destination1__ADDRESS: "https+http://basket-api"
+      REVERSEPROXY__CLUSTERS__cluster_ordering-api__DESTINATIONS__destination1__ADDRESS: "https+http://ordering-api"
+      REVERSEPROXY__CLUSTERS__cluster_catalog-api__DESTINATIONS__destination1__ADDRESS: "https+http://catalog-api"
+      services__ordering-api__http__0: "http://ordering-api:${ORDERING_API_PORT}"
+      services__catalog-api__http__0: "http://catalog-api:${CATALOG_API_PORT}"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://env-dashboard:18889"
+      OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
+      OTEL_SERVICE_NAME: "gateway"
+    expose:
+      - "5000"
+    depends_on:
+      basket-api:
+        condition: "service_started"
+      ordering-api:
+        condition: "service_started"
+      catalog-api:
+        condition: "service_started"
+    networks:
+      - "aspire"
+networks:
+  aspire:
+    driver: "bridge"
