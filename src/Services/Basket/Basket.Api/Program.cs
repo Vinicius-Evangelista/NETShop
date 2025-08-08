@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using BuildingBlocks.Messaging.MassTransit;
 using Discount.Grpc;
 using Marten.Services;
@@ -5,6 +6,8 @@ using Npgsql;
 using OpenTelemetry;
 using OpenTelemetry.Trace;
 using OpenTelemetry.Metrics;
+using System.Text;
+using Carter.Request;
 
 var assembly = typeof(Program).Assembly;
 var builder = WebApplication.CreateBuilder(args: args);
@@ -91,7 +94,6 @@ builder.Services.AddScoped<IBasketRepository>(
     }
 );
 
-
 builder.Services.AddHealthChecks();
 
 builder.Services.AddMessageBroker(builder.Configuration);
@@ -117,6 +119,23 @@ builder.Services
             .AddAspNetCoreInstrumentation(options =>
             {
                 options.RecordException = true;
+                options.EnrichWithHttpRequest = async void (activity, request) =>
+                {
+                    activity.SetTag("http.request.path",
+                        request.Path);
+                    activity.SetTag("http.request.query_string",
+                        request.QueryString);
+                    request.EnableBuffering();
+                    using var reader = new StreamReader(request.Body,
+                        Encoding.UTF8, leaveOpen: true);
+                    var body = await reader.ReadToEndAsync();
+                    if (!string.IsNullOrWhiteSpace(body))
+                    {
+                        activity.SetTag("http.request.body", body);
+                    }
+
+                    request.Body.Position = 0;
+                };
             })
             .AddEntityFrameworkCoreInstrumentation(options =>
             {

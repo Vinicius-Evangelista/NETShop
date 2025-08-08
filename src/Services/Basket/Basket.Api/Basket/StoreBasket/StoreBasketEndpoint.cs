@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Basket.Api.Basket.StoreBasket;
 
 public record StoreBasketRequest(ShoppingCart Cart)
@@ -25,6 +27,7 @@ public class StoreBasketEndpoint : ICarterModule
                     ISender sender
                 ) =>
                 {
+
                     var command = StoreBasketRequest.FromRequest(
                         req: req
                     );
