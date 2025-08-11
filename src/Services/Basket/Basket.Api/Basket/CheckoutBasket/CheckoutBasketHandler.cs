@@ -2,6 +2,7 @@ using Basket.API.Dtos;
 using BuildingBlocks.Messaging.Events;
 using Mapster;
 using MassTransit;
+using System.Diagnostics;
 
 namespace Basket.API.Basket.CheckoutBasket;
 
@@ -28,14 +29,21 @@ public class CheckoutBasketCommandHandler(
     IPublishEndpoint publishEndpoint)
     : ICommandHandler<CheckoutBasketCommand, CheckoutBasketResult>
 {
+    private static readonly ActivitySource ActivitySource = new("Basket.CheckoutBasket");
+
     public async Task<CheckoutBasketResult> Handle(
         CheckoutBasketCommand command,
         CancellationToken cancellationToken)
     {
+        using var activity = ActivitySource.StartActivity("CheckoutBasket");
+        activity?.SetTag("basket.userName", command.BasketCheckoutDto.UserName);
+        activity?.AddEvent(new ActivityEvent("CheckoutBasketStarted"));
+
         var basket = await repository.GetBasketAsync(
             command.BasketCheckoutDto.UserName, cancellationToken);
         if (basket == null)
         {
+            activity?.AddEvent(new ActivityEvent("BasketNotFound"));
             return new CheckoutBasketResult(false);
         }
 
@@ -45,9 +53,11 @@ public class CheckoutBasketCommandHandler(
 
         await publishEndpoint.Publish(eventMessage,
             cancellationToken);
+        activity?.AddEvent(new ActivityEvent("BasketPublished"));
 
         await repository.DeleteBasketAsync(
             command.BasketCheckoutDto.UserName, cancellationToken);
+        activity?.AddEvent(new ActivityEvent("BasketDeleted"));
 
         return new CheckoutBasketResult(true);
     }

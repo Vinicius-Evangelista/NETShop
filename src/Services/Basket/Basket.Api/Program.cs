@@ -170,6 +170,13 @@ builder.Services
 
 builder.Services.AddOpenTelemetry().UseOtlpExporter();
 
+// used in case we want to create a custom OpenTelemetry TracerProvider
+// using var provider = Sdk
+//     .CreateTracerProviderBuilder()
+//     .ConfigureResource(b => b.AddService("example-service"))
+//     .AddSource("example-source")
+//     .AddOtlpExporter().Build();
+
 var app = builder.Build();
 
 app.UseExceptionHandler(configure: options => { });
