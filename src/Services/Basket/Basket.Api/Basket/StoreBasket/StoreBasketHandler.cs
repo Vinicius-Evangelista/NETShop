@@ -1,4 +1,5 @@
 using Discount.Grpc;
+using OpenTelemetry;
 
 namespace Basket.Api.Basket.StoreBasket;
 
@@ -40,6 +41,8 @@ public class StoreBasketEndpointHandler(
             basket: command.Cart,
             cancellationToken: cancellationToken
         );
+
+        Baggage.SetBaggage("basket_name", command.Cart.UserName);
 
         return new StoreBasketResult(UserName: command.Cart.UserName);
     }

@@ -7,7 +7,8 @@ using OpenTelemetry;
 using OpenTelemetry.Trace;
 using OpenTelemetry.Metrics;
 using System.Text;
-using Carter.Request;
+using Basket.Api.OpenTelemetry.Processors;
+using OpenTelemetry.Resources;
 
 var assembly = typeof(Program).Assembly;
 var builder = WebApplication.CreateBuilder(args: args);
@@ -108,9 +109,26 @@ builder.Services
             .AddHttpClientInstrumentation()
             .AddMeter("Marten")
             .AddMeter("MassTransit")
-            .AddMeter("RabbitMQ.Client"))
+            .AddMeter("RabbitMQ.Client")
+            .ConfigureResource(resourceBuilder =>
+                resourceBuilder
+                    .AddService("Basket.Api")
+                    .AddAttributes(new[]
+                    {
+                        new KeyValuePair<string, object>("environment", builder.Environment.EnvironmentName)
+                    })
+            )
+    )
     .ConfigureOpenTelemetryTracerProvider(traceBuilder =>
         traceBuilder
+            .ConfigureResource(resourceBuilder =>
+                resourceBuilder
+                    .AddService("Basket.Api")
+                    .AddAttributes(new[]
+                    {
+                        new KeyValuePair<string, object>("environment", builder.Environment.EnvironmentName)
+                    })
+            )
             .AddHttpClientInstrumentation()
             .AddRedisInstrumentation(options =>
             {
@@ -119,23 +137,26 @@ builder.Services
             .AddAspNetCoreInstrumentation(options =>
             {
                 options.RecordException = true;
-                options.EnrichWithHttpRequest = async void (activity, request) =>
-                {
-                    activity.SetTag("http.request.path",
-                        request.Path);
-                    activity.SetTag("http.request.query_string",
-                        request.QueryString);
-                    request.EnableBuffering();
-                    using var reader = new StreamReader(request.Body,
-                        Encoding.UTF8, leaveOpen: true);
-                    var body = await reader.ReadToEndAsync();
-                    if (!string.IsNullOrWhiteSpace(body))
+                options.EnrichWithHttpRequest =
+                    async void (activity, request) =>
                     {
-                        activity.SetTag("http.request.body", body);
-                    }
+                        activity.SetTag("http.request.path",
+                            request.Path);
+                        activity.SetTag("http.request.query_string",
+                            request.QueryString);
+                        request.EnableBuffering();
+                        using var reader = new StreamReader(
+                            request.Body,
+                            Encoding.UTF8, leaveOpen: true);
+                        var body = await reader.ReadToEndAsync();
+                        if (!string.IsNullOrWhiteSpace(body))
+                        {
+                            activity.SetTag("http.request.body",
+                                body);
+                        }
 
-                    request.Body.Position = 0;
-                };
+                        request.Body.Position = 0;
+                    };
             })
             .AddEntityFrameworkCoreInstrumentation(options =>
             {
@@ -143,7 +164,9 @@ builder.Services
             })
             .AddSource("Marten")
             .AddSource("MassTransit")
-            .AddSource("RabbitMQ.Client"));
+            .AddSource("RabbitMQ.Client")
+            .AddProcessor(new BasketBaggageProcessor())
+    );
 
 builder.Services.AddOpenTelemetry().UseOtlpExporter();
 
