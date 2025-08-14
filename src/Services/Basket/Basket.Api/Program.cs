@@ -8,6 +8,7 @@ using OpenTelemetry.Trace;
 using OpenTelemetry.Metrics;
 using System.Text;
 using Basket.Api.OpenTelemetry.Processors;
+using OpenTelemetry.Logs;
 using OpenTelemetry.Resources;
 
 var assembly = typeof(Program).Assembly;
@@ -115,7 +116,9 @@ builder.Services
                     .AddService("Basket.Api")
                     .AddAttributes(new[]
                     {
-                        new KeyValuePair<string, object>("environment", builder.Environment.EnvironmentName)
+                        new KeyValuePair<string, object>(
+                            "environment",
+                            builder.Environment.EnvironmentName)
                     })
             )
     )
@@ -126,7 +129,9 @@ builder.Services
                     .AddService("Basket.Api")
                     .AddAttributes(new[]
                     {
-                        new KeyValuePair<string, object>("environment", builder.Environment.EnvironmentName)
+                        new KeyValuePair<string, object>(
+                            "environment",
+                            builder.Environment.EnvironmentName)
                     })
             )
             .AddHttpClientInstrumentation()
@@ -161,12 +166,26 @@ builder.Services
             .AddEntityFrameworkCoreInstrumentation(options =>
             {
                 options.SetDbStatementForText = true;
-            })
+            }).AddOtlpExporter((options) =>
+                options.TimeoutMilliseconds = 5000)
             .AddSource("Marten")
             .AddSource("MassTransit")
             .AddSource("RabbitMQ.Client")
             .AddProcessor(new BasketBaggageProcessor())
-    );
+    )
+    .ConfigureOpenTelemetryLoggerProvider(options =>
+    {
+        options
+            .SetResourceBuilder(
+                ResourceBuilder.CreateDefault()
+                    .AddService("Basket.Api")
+                    .AddAttributes([
+                        new(
+                            "environment",
+                            builder.Environment.EnvironmentName)
+                    ])
+            );
+    });
 
 builder.Services.AddOpenTelemetry().UseOtlpExporter();
 
