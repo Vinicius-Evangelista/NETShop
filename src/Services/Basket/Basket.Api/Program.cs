@@ -8,6 +8,7 @@ using OpenTelemetry.Trace;
 using OpenTelemetry.Metrics;
 using System.Text;
 using Basket.Api.OpenTelemetry.Processors;
+using Discount.Grpc.Opentelemetry.Grpc;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Resources;
 
@@ -98,6 +99,11 @@ builder.Services.AddScoped<IBasketRepository>(
 
 builder.Services.AddHealthChecks();
 
+builder.Services.AddGrpc(options =>
+{
+    options.Interceptors.Add<GrpcTracingInterceptor>();
+});
+
 builder.Services.AddMessageBroker(builder.Configuration);
 
 builder.Services
@@ -163,6 +169,9 @@ builder.Services
                         request.Body.Position = 0;
                     };
             })
+            .AddGrpcClientInstrumentation(options =>
+            {
+            })
             .AddEntityFrameworkCoreInstrumentation(options =>
             {
                 options.SetDbStatementForText = true;
@@ -203,3 +212,4 @@ app.MapCarter();
 app.UseHealthChecks(path: "/health");
 
 app.Run();
+
